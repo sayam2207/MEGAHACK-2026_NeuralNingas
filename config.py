@@ -28,7 +28,7 @@ TOPIC_STATUS   = "aicar/status"    # JSON: {status, time}
 # ============================================================
 OPENROUTER_API_KEY = os.environ.get(
     "OPENROUTER_API_KEY",
-    "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",
+    "API Key",
 )
 OPENROUTER_API_URL = "https://openrouter.ai/api/v1/chat/completions"
 OPENROUTER_MODEL = "openai/gpt-3.5-turbo"  # or "google/gemini-2.0-flash-001"
