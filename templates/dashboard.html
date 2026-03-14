@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>AI RC Car — Web Dashboard</title>
+    <meta name="description" content="Control your AI RC Car from any device. Real-time sensors, D-pad controls, and AI chat.">
+    <link rel="stylesheet" href="/static/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.4/socket.io.min.js"></script>
+</head>
+<body>
+
+    <!-- HEADER -->
+    <header class="header">
+        <div class="header-left">
+            <span class="header-dot" id="statusDot">●</span>
+            <h1 class="header-title">AI RC CAR</h1>
+            <span class="header-sub">WEB CONTROL</span>
+        </div>
+        <div class="header-right">
+            <span class="connection-badge" id="connBadge">Connecting...</span>
+        </div>
+    </header>
+    <div class="header-glow"></div>
+
+    <!-- MAIN CONTENT -->
+    <main class="main">
+
+        <!-- SENSOR PANEL -->
+        <section class="card sensor-panel">
+            <div class="card-header">
+                <span class="card-icon">◈</span>
+                <span class="card-title cyan">LIVE SENSORS</span>
+                <span class="sensor-status" id="sensorStatus">● WAITING</span>
+            </div>
+            <div class="card-sep"></div>
+
+            <div class="sensor-row" id="sensorFront">
+                <span class="sensor-icon cyan">▲</span>
+                <span class="sensor-name">Front</span>
+                <div class="sensor-bar-track"><div class="sensor-bar-fill" id="barFront"></div></div>
+                <span class="sensor-value" id="valFront">---</span>
+            </div>
+            <div class="sensor-row" id="sensorBack">
+                <span class="sensor-icon cyan">▼</span>
+                <span class="sensor-name">Back</span>
+                <div class="sensor-bar-track"><div class="sensor-bar-fill" id="barBack"></div></div>
+                <span class="sensor-value" id="valBack">---</span>
+            </div>
+            <div class="sensor-row" id="sensorLeft">
+                <span class="sensor-icon cyan">◄</span>
+                <span class="sensor-name">Left</span>
+                <div class="sensor-bar-track"><div class="sensor-bar-fill" id="barLeft"></div></div>
+                <span class="sensor-value" id="valLeft">---</span>
+            </div>
+            <div class="sensor-row" id="sensorRight">
+                <span class="sensor-icon cyan">►</span>
+                <span class="sensor-name">Right</span>
+                <div class="sensor-bar-track"><div class="sensor-bar-fill" id="barRight"></div></div>
+                <span class="sensor-value" id="valRight">---</span>
+            </div>
+
+            <div class="card-sep"></div>
+            <div class="info-box">
+                <span id="infoMode">⚙ Mode: MANUAL</span>
+                <span id="infoSpeed">⚡ Speed: 200 / 255</span>
+            </div>
+        </section>
+
+        <!-- CONTROLS PANEL -->
+        <section class="card control-panel">
+            <div class="card-header">
+                <span class="card-icon">◈</span>
+                <span class="card-title purple">CONTROLS</span>
+                <span class="card-hint">Touch / Click</span>
+            </div>
+            <div class="card-sep"></div>
+
+            <!-- D-PAD -->
+            <div class="dpad">
+                <div class="dpad-row">
+                    <button class="dpad-btn cyan-btn" id="btnForward" data-cmd="forward">▲</button>
+                </div>
+                <div class="dpad-row">
+                    <button class="dpad-btn cyan-btn" id="btnLeft" data-cmd="left">◄</button>
+                    <button class="dpad-btn stop-btn" id="btnStop" data-cmd="stop">■</button>
+                    <button class="dpad-btn cyan-btn" id="btnRight" data-cmd="right">►</button>
+                </div>
+                <div class="dpad-row">
+                    <button class="dpad-btn cyan-btn" id="btnBackward" data-cmd="backward">▼</button>
+                </div>
+            </div>
+
+            <!-- SPEED BUTTONS -->
+            <div class="speed-row">
+                <button class="speed-btn green-btn" id="btnSpeedFull" data-cmd="speed_full">⚡ FULL</button>
+                <button class="speed-btn yellow-btn" id="btnSpeedSlow" data-cmd="speed_slow">🐢 SLOW</button>
+            </div>
+
+            <!-- MODE SELECTOR -->
+            <div class="card-sep"></div>
+            <div class="mode-row">
+                <button class="mode-btn" id="modeManual" data-mode="manual">MANUAL</button>
+                <button class="mode-btn" id="modeAuto" data-mode="auto">AUTO</button>
+                <button class="mode-btn" id="modePark" data-mode="park">PARK</button>
+            </div>
+        </section>
+
+        <!-- CHAT PANEL -->
+        <section class="card chat-panel">
+            <div class="card-header">
+                <span class="card-icon">◈</span>
+                <span class="card-title blue">AI CHAT</span>
+                <span class="card-hint" id="chatCount">0 messages</span>
+            </div>
+            <div class="card-sep"></div>
+
+            <div class="chat-log" id="chatLog"></div>
+
+            <div class="chat-input-row" style="display: flex; gap: 8px;">
+                <button class="chat-mic-btn" id="chatMic" title="Hold to Speak" style="flex: 0 0 44px; border-radius: 8px; font-size: 1.2rem; background: var(--surface); color: var(--text-muted); border: 1px solid var(--border); cursor: pointer; transition: all 0.2s; padding: 0;">🎤</button>
+                <input type="text" class="chat-input" id="chatInput"
+                       placeholder="Ask the AI or type a command..." autocomplete="off">
+                <button class="chat-send-btn" id="chatSend">SEND ›</button>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- STATUS BAR -->
+    <footer class="status-bar">
+        <span class="status-item" id="mqttStatus">● MQTT: Connecting...</span>
+        <span class="status-item" id="carStatus">● Car: Offline</span>
+    </footer>
+
+    <script src="/static/app.js"></script>
+</body>
+</html>
